@@ -1,0 +1,38 @@
+name: Cypress
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Cypress-unit-test:
+    runs-on: debian-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build and start Docker containers
+        run: docker-compose up -d --build
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v4
+        with:
+          command: npx cypress run
+          browser: chrome
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Docker Tags
+        run: docker tag php:7.4-apache ${{ secrets.DOCKER_HUB_USER }}/h3docker:latest
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_HUB_USER }}/h3docker:latest

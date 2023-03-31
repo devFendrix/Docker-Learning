@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    container_name: docker-php
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+      - "80:80"
+
+  mysql:
+    image: mariadb:10.6
+    container_name: docker-db
+    working_dir: /application
+    volumes:
+      - .:/application
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
